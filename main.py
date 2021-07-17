@@ -2,7 +2,7 @@ from pytube import YouTube
 import os
 import re
 
-banned_chars = ['"', '*', '<', '>', '?', '\\', '|', '/', ':']
+banned_chars = ['"', '*', '<', '>', '?', '\\', '|', '/', ':', '#']
 
 def progress_function(stream, chunk, bytes_remaining):
     print('\r', round((1-bytes_remaining/stream.filesize)*100, 3), '% done...', end="")
