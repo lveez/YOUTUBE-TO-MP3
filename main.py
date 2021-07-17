@@ -1,11 +1,18 @@
+from moviepy.tools import verbose_print
 from pytube import YouTube
+from moviepy.editor import *
 import os
 import re
 
-banned_chars = ['"', '*', '<', '>', '?', '\\', '|', '/', ':', '#']
+banned_chars = ['"', '*', '<', '>', '?', '\\', '|', '/', ':', '#', ',']
 
 def progress_function(stream, chunk, bytes_remaining):
     print('\r', round((1-bytes_remaining/stream.filesize)*100, 3), '% done...', end="")
+
+def mp4_to_mp3(mp4, mp3):
+    mp4_wo_frames = AudioFileClip(mp4)
+    mp4_wo_frames.write_audiofile(mp3, verbose=False)
+    mp4_wo_frames.close()
 
 def DownloadVideo(link, filename, output):
     yt = YouTube(link, on_progress_callback=progress_function)
@@ -18,13 +25,15 @@ def DownloadVideo(link, filename, output):
         print("No streams found")
         return
     stream = yt.streams.filter(file_extension='mp4', type='audio')[0]
-    stream.download(filename=name)  
+    path = stream.download(filename=name)  
     print('') 
     for char in banned_chars:
         name = name.replace(char, '')
     if name[-1] == '.' or name[-1] == ' ':
         name = name[:-1]
-    os.rename(os.getcwd() + '\\' + name + '.mp4', output + '\\' + name + '.mp3')
+    mp4_to_mp3(path, path[:-3] + 'mp3')
+    os.remove(path)
+    os.rename(path[:-3] + 'mp3', output + '\\' + name + '.mp3')
     print("Done.")
 
 def Main():
